@@ -23,7 +23,10 @@ use clap::Command;
 use fms_proto::fms::VehicleStatus;
 use status_publishing::StatusPublisher;
 use hono_publisher::HonoPublisher;
+use zenoh_publisher::ZenohPublisher;
 use influx_client::writer::InfluxWriter;
+use std::sync::Arc;
+use zenoh::prelude::r#async::*;
 use log::{error, info};
 use tokio::sync::mpsc;
 
@@ -31,9 +34,12 @@ mod status_publishing;
 mod vehicle_abstraction;
 mod hono_publisher;
 mod mqtt_connection;
+mod zenoh_publisher;
 
 const SUBCOMMAND_HONO: &str = "hono";
 const SUBCOMMAND_INFLUX: &str = "influx";
+const SUBCOMMAND_ZENOH: &str = "zenoh";
+use crate::zenoh_publisher::parse_args;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -53,8 +59,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         ))
         .subcommand(influx_client::connection::add_command_line_args(
             Command::new(SUBCOMMAND_INFLUX).about("Forwards VSS data to an Influx DB server"),
+        ))
+        .subcommand(zenoh_publisher::add_command_line_args(
+            Command::new(SUBCOMMAND_ZENOH).about("Forwards VSS data to an zenoh"),
         ));
-
+        
     let args = parser.get_matches();
 
     let publisher: Box<dyn StatusPublisher> = match args.subcommand_name() {
@@ -74,6 +83,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Ok(writer) => Box::new(writer),
                 Err(e) => {
                     error!("failed to create InfluxDB writer: {e}");
+                    process::exit(1);
+                }
+            }
+        },
+        Some(SUBCOMMAND_ZENOH) => {   
+             let zenoh_args = args.subcommand_matches(SUBCOMMAND_ZENOH).unwrap();
+             let config = parse_args(zenoh_args);        
+            let z_session = Arc::new(zenoh::open(config).res().await.unwrap());
+            match ZenohPublisher::new(z_session.clone()).await{
+                Ok(writer) => Box::new(writer),
+                Err(e) => {
+                    error!("failed to create zenoh Publisher: {e}");
                     process::exit(1);
                 }
             }

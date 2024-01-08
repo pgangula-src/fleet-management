@@ -111,13 +111,13 @@ as shown in the diagram below.
 
 <img src="img/architecture-zenoh.drawio.png">
 
-1. Create a local docker image for FMS Forworder to support the zenoh communication, run the below command from docker component directory:
+1. Create a local docker image for FMS Forworder to support the zenoh communication, run the below command from  fleet-management/components/ directory:
    
    ```sh
    docker build -t fms-forwarder:custom -f Dockerfile.fms-forwarder .
    ```
    
-2. Start up the zenoh router and back end services using Docker Compose files in the top level folder:
+2. Start up the zenoh router and back end services using Docker Compose files in the top level (fleet-management/) folder:
 
    ```sh
    docker compose -f ./fms-blueprint-compose-zenoh.yaml -f ./fms-blueprint-compose.yaml up --detach

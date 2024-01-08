@@ -145,7 +145,7 @@ services:
     # for the time being, we do not use TLS secured connections to Databroker
     command: "--insecure"
   fms-forwarder:
-    image: "ghcr.io/eclipse-sdv-blueprints/fleet-management/fms-forwarder:main"
+    image: "fms-forwarder:custom"
     build: &fms-forwarder-build
       context: "./components"
       dockerfile: "Dockerfile.fms-forwarder"
@@ -159,7 +159,7 @@ services:
         condition: service_healthy
       databroker:
         condition: service_started
-    command: "influx"
+    command: "zenoh -m client"
     env_file: "${FMS_FORWARDER_PROPERTIES_FILE:-./influxdb/fms-demo.env}"
     environment:
       INFLUXDB_TOKEN_FILE: "/etc/forwarder/fms-demo.token"

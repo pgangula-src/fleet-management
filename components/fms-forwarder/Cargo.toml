@@ -30,6 +30,7 @@ readme.workspace = true
 
 [dependencies]
 async-trait = { workspace = true }
+async-std = {features = ["attributes"] }
 chrono = { workspace = true, features = ["std"] }
 clap = { workspace = true, features = ["std", "env", "color", "help", "usage", "error-context", "suggestions"] }
 duration-str = { workspace = true, features = ["time"] }
@@ -38,6 +39,17 @@ fms-proto = { workspace = true }
 influx-client = { workspace = true, features = ["writer"] }
 log = { workspace = true }
 paho-mqtt = { version = "0.12", default-features = false, features = [ "vendored-ssl" ] }
+zenoh = {version = "0.10.1-rc", default-features = false, features = [
+     "auth_pubkey",
+     "auth_usrpwd",
+     "transport_multilink",
+     "transport_quic",
+     "transport_tcp",
+     "transport_tls",
+     "transport_udp",
+     "transport_unixsock-stream",
+     "transport_ws",
+]  }
 protobuf = { workspace = true }
 prost = { workspace = true }
 prost-types = { workspace = true }

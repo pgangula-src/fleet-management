@@ -16,7 +16,7 @@ use crate::config::WhatAmI;
 use crate::config::EndPoint;
 
 
-const key_expr: &str = "fms/vehicleStatus";
+const KEY_EXPR: &str = "fms/vehicleStatus";
 
 
 pub fn add_command_line_args(command: Command) -> Command {
@@ -94,7 +94,7 @@ pub struct ZenohPublisher<'a> {
  impl<'a> ZenohPublisher<'a> {
     pub async fn new(z_session: Arc<Session>) -> Result<ZenohPublisher<'a>, Box<dyn std::error::Error>>{  
 
-        let publisher = z_session.declare_publisher(key_expr).res().unwrap();
+        let publisher = z_session.declare_publisher(KEY_EXPR).res().unwrap();
         Ok(ZenohPublisher {
 
             // Session
